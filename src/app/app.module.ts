@@ -8,9 +8,9 @@ import { MatCardModule } from '@angular/material'
 
 
 import { AppComponent } from './app.component';
-import { PostComponentComponent } from './post-create/post-create.component';
+import { PostComponentComponent } from './posts/post-create/post-create.component';
 import { HeaderComponent } from './header/header.component';
-import { PostListComponent } from './post-create/post-list/post-list.component';
+import { PostListComponent } from './posts/post-list/post-list.component';
 
 
 @NgModule({
