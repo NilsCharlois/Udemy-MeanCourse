@@ -14,13 +14,14 @@ export class PostListComponent implements OnInit, OnDestroy{
 
   constructor(public postsService: PostsService) { }
 
-  @Input() posts: Post[] = [];
+  posts: Post[] = [];
 
   ngOnInit(){
+    this.postsService.getPosts();
     this.postsUpdateSub = this.postsService
     .getPostsUpdateListener()
       .subscribe((posts: Post[])=>{
-this.posts = posts;
+        this.posts = posts;
       });
     ;
   }
