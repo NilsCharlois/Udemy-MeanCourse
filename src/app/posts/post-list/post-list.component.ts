@@ -15,13 +15,16 @@ export class PostListComponent implements OnInit, OnDestroy{
   constructor(public postsService: PostsService) { }
 
   posts: Post[] = [];
+  isLoading = false; // for the spinner
 
   ngOnInit(){
     this.postsService.getPosts();
+    this.isLoading = true;
     this.postsUpdateSub = this.postsService
     .getPostsUpdateListener()
       .subscribe((posts: Post[])=>{
         this.posts = posts;
+        this.isLoading = false;
       });
     ;
   }

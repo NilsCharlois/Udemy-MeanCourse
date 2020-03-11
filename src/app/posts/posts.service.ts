@@ -48,8 +48,25 @@ export class PostsService {
     });
   }
 
+  updatePost(id: string, title: string, content: string) {
+    const post :  Post = {id: id, title: title, content: content};
+    this.HttpClient
+    .put('http://localhost:3000/api/posts/'+id, post)
+    .subscribe(response=>{
+      const updatedPosts = [...this.posts];
+      // find post by id
+      const oldPostIndex = updatedPosts.findIndex(p => p.id === post.id);
+      // override the local post
+      updatedPosts[oldPostIndex] = post;
+      // update the post array
+      this.posts = updatedPosts;
+      this.postsUpdated.next([...this.posts]);
+    });
+  }
+
   getPost(id: string) {
-    return {...this.posts.find(p=>p.id === id)}
+    return this.HttpClient
+    .get<{_id:string, title:string, content:string}>("http://localhost:3000/api/posts/"+id)
   }
 
   deletePost(id: string){

@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatInputModule } from '@angular/material/input'
-import { MatButtonModule, MatToolbarModule, MatExpansionModule } from "@angular/material";
+import { MatButtonModule, MatToolbarModule, MatExpansionModule, MatProgressSpinnerModule } from "@angular/material";
 import { MatCardModule } from '@angular/material'
 
 
@@ -31,6 +31,7 @@ import { AppRoutingModule } from './app-routing.module'
     MatButtonModule,
     MatToolbarModule,
     MatExpansionModule,
+    MatProgressSpinnerModule,
     HttpClientModule
   ],
   providers: [],
