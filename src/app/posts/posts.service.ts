@@ -35,14 +35,22 @@ export class PostsService {
     return this.postsUpdated.asObservable();
   }
 
-  addPost(title: string, content: string){
-    const post : Post = {id: null, title: title, content: content};
+  addPost(title: string, content: string, image:File){
+    const postData = new FormData(); // to mix blob and string KVPs
+    postData.append("title", title);
+    postData.append("content", content);
+    postData.append("image", image, title); // title will be overwritten in the backend
     this.HttpClient
-    .post<{message: string, postId: string}>('http://localhost:3000/api/posts', post)
+    .post<{message: string, postId: string}>(
+      'http://localhost:3000/api/posts', postData
+    )
     .subscribe((responseData)=>{
       // updated created post with id returned from POST call
-      const postId = responseData.postId;
-      post.id = postId;
+      const post: Post = {
+        id: responseData.postId,
+        title: title,
+        content: content
+      }
       this.posts.push(post);
       this.postsUpdated.next([...this.posts]);
     });
