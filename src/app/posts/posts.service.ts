@@ -21,7 +21,8 @@ export class PostsService {
         return {
           title: post.title,
           content: post.content,
-          id: post._id
+          id: post._id,
+          imagePath: post.imagePath
         }
       })
     }))
@@ -35,35 +36,55 @@ export class PostsService {
     return this.postsUpdated.asObservable();
   }
 
-  addPost(title: string, content: string, image:File){
+  addPost(title: string, content: string, image: File){
     const postData = new FormData(); // to mix blob and string KVPs
     postData.append("title", title);
     postData.append("content", content);
     postData.append("image", image, title); // title will be overwritten in the backend
     this.HttpClient
-    .post<{message: string, postId: string}>(
+    .post<{message: string, post: Post}>(
       'http://localhost:3000/api/posts', postData
     )
-    .subscribe((responseData)=>{
+    .subscribe(responseData=>{
       // updated created post with id returned from POST call
       const post: Post = {
-        id: responseData.postId,
+        id: responseData.post.id,
         title: title,
-        content: content
+        content: content,
+        imagePath: responseData.post.imagePath
       }
       this.posts.push(post);
       this.postsUpdated.next([...this.posts]);
     });
   }
 
-  updatePost(id: string, title: string, content: string) {
-    const post :  Post = {id: id, title: title, content: content};
+  updatePost(id: string, title: string, content: string, image: File | string) {
+    let postData: Post | FormData;
+    if(typeof(image) === 'object'){
+      postData = new FormData();
+      postData.append('title', title);
+      postData.append('content', content);
+      postData.append('image', image, title);
+    } else {
+      postData = {
+        id: id,
+        title: title,
+        content: content,
+        imagePath: image
+      }
+    }
     this.HttpClient
-    .put('http://localhost:3000/api/posts/'+id, post)
+    .put('http://localhost:3000/api/posts/'+id, postData)
     .subscribe(response=>{
       const updatedPosts = [...this.posts];
       // find post by id
-      const oldPostIndex = updatedPosts.findIndex(p => p.id === post.id);
+      const oldPostIndex = updatedPosts.findIndex(p => p.id === id);
+      const post: Post = {
+        id: id,
+        title: title,
+        content: content,
+        imagePath: ""
+      }
       // override the local post
       updatedPosts[oldPostIndex] = post;
       // update the post array
@@ -74,7 +95,7 @@ export class PostsService {
 
   getPost(id: string) {
     return this.HttpClient
-    .get<{_id:string, title:string, content:string}>("http://localhost:3000/api/posts/"+id)
+    .get<{_id:string, title:string, content:string, imagePath: string}>("http://localhost:3000/api/posts/"+id)
   }
 
   deletePost(id: string){

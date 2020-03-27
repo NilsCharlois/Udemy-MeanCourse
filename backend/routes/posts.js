@@ -34,20 +34,28 @@ const storage = multer.diskStorage({
 
 // to add a new post
 router.post("", multer({storage: storage}).single("image"), (req, res, next)=>{
+  const url = req.protocol + "://" + req.get("host");
   const post = new Post({
     title: req.body.title,
-    content: req.body.content
+    content: req.body.content,
+    imagePath: url + "/images/" + req.file.filename
   });
   post.save().then(createdPost=>{
     res.status(201).json({
       message: "Post added successfully!",
-      postId: createdPost._id
+      post: {
+        ...createdPost,
+        id: createdPost._id, // need to remap the id
+      }
     });
   });
 });
 
 // to patch posts
-router.put("/:id", (req,res,next)=>{
+router.put("/:id",
+ multer({storage: storage}).single("image"),
+ (req,res,next)=>{
+   console.log(req.file);
   const post = new Post({
     _id: req.body.id,
     title: req.body.title,

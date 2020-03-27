@@ -11,3 +11,11 @@
 mat-spinner{
   margin:auto;
 }
+
+.post-image {
+  width: 100%
+}
+ .post-image img {
+   width: 100%;
+   box-shadow: 5px 5px 5px 1px rgba(93,75,227,0.75);
+ }
