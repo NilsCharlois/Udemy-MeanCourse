@@ -87,7 +87,11 @@ export class PostCreateComponent implements OnInit {
         this.form.value.title,
         this.form.value.content,
         this.form.value.image
-      );
+      ).subscribe(()=>{
+        this.form.reset();
+        // go back to posts page
+        this.router.navigate(["/"]);
+      });
     }
     else
     {
@@ -96,11 +100,11 @@ export class PostCreateComponent implements OnInit {
         this.form.value.title,
         this.form.value.content,
         this.form.value.image
-      );
+      ).subscribe(()=>{
+        this.form.reset();
+        // go back to posts page
+        this.router.navigate(["/"]);
+      });
     }
-    this.form.reset();
-    console.log("Redirecting");
-    // go back to posts page
-    this.router.navigate(["/"]);
   }
 }

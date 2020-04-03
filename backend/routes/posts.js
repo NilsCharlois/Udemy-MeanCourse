@@ -57,7 +57,7 @@ router.put("/:id",
  (req,res,next)=>{
    let imagePath = req.body.imagePath;
    if(req.file) {
-     const url = reqp.protocol + "://" + req.get("host");
+     const url = req.protocol + "://" + req.get("host");
      imagePath = url + "/images/" + req.file.filename;
    }
   const post = new Post({
@@ -75,13 +75,28 @@ Post.updateOne({_id: req.params.id}, post).then(result=>{
 
 // to get all posts
 router.get("", (req, res, next)=> {
-  Post
-  .find()
+  const pageSize = +req.query.PageSize;
+  const currentPage = +req.query.CurrentPage;
+  console.log('pageSize: '+ pageSize + ' currentPage: ' + currentPage);
+  const postQuery = Post.find();
+  let fetchedPosts;
+  if(pageSize && currentPage) {
+    postQuery
+    .skip(pageSize * (currentPage - 1)) // skip the first documents based on pageSize and currentPage
+    .limit(pageSize); // just select the required amount of documents
+  }
+  postQuery
   .then(documents=>{
-    res.status(200).json({
-    message: 'Posts fetched successfully!',
-    posts: documents
-  });
+    fetchedPosts = documents;
+    console.log('fetchedPosts length: '+fetchedPosts.length);
+    return Post.count();
+  })
+    .then(count=>{
+      res.status(200).json({
+        message: 'Posts fetched successfully!',
+        posts: fetchedPosts,
+        maxPosts: count
+    });
   });
 });
 
