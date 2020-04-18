@@ -3,6 +3,7 @@ import { Post } from '../post.model'
 import { PostsService } from '../posts.service'
 import { Subscription } from 'rxjs';
 import { PageEvent } from '@angular/material';
+import { AuthService } from 'src/app/auth/auth.service';
 
 @Component({
   selector: 'app-post-list',
@@ -12,6 +13,8 @@ import { PageEvent } from '@angular/material';
 
 export class PostListComponent implements OnInit, OnDestroy{
   private postsUpdateSub : Subscription;
+  private statusSub: Subscription;
+
   posts: Post[] = [];
   isLoading = false; // for the spinner
   totalPosts = 0; // for the paginator module
@@ -19,7 +22,10 @@ export class PostListComponent implements OnInit, OnDestroy{
   pageSizeOptions = [1, 2, 5, 10, 25, 50]; // for the paginator module
   currentPage = 1;
 
-  constructor(public postsService: PostsService) { }
+  public userIsAuthenticated: Boolean;
+
+  constructor(public postsService: PostsService,
+    private authService: AuthService) { }
 
   ngOnInit(){
     this.isLoading = true;
@@ -27,12 +33,21 @@ export class PostListComponent implements OnInit, OnDestroy{
     this.isLoading = true;
     this.postsUpdateSub = this.postsService
     .getPostsUpdateListener()
-      .subscribe((postData: {posts: Post[], postCount: number})=>{
-        this.posts = postData.posts;
-        this.totalPosts = postData.postCount;
-        this.isLoading = false;
-      });
+      .subscribe(
+        (postData: {posts: Post[], postCount: number})=>
+        {
+          this.posts = postData.posts;
+          this.totalPosts = postData.postCount;
+          this.isLoading = false;
+        }
+      )
     ;
+    this.userIsAuthenticated = this.authService.getIsAuthenticated();
+    this.statusSub = this.authService
+    .getAuthStatusListener()
+    .subscribe(isAuthenticated=>{
+      this.userIsAuthenticated = isAuthenticated;
+    });
   }
 
   onPageChanged(pageData: PageEvent) {
@@ -48,6 +63,7 @@ export class PostListComponent implements OnInit, OnDestroy{
     this.postsService.deletePost(id).subscribe(()=>{
       this.postsService.getPosts(this.postsPerPage, this.currentPage);
     });
+    this.statusSub.unsubscribe();
   }
 
   ngOnDestroy(){

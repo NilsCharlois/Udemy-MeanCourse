@@ -1,5 +1,4 @@
 <mat-card>
-  <mat-spinner *ngIf="isLoading"></mat-spinner>
   <form (submit)="onLogin(loginForm)" #loginForm="ngForm" *ngIf="!isLoading">
     <mat-form-field>
       <input
@@ -26,6 +25,8 @@
     </mat-form-field>
     <button mat-raised-button
     color="primary"
-    type="submit">Login</button>
+    type="submit"
+    *ngIf="!isLoading">Login</button>
+    <mat-spinner *ngIf="isLoading"></mat-spinner>
   </form>
 </mat-card>
